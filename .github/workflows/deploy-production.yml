@@ -1,0 +1,26 @@
+name: Desplegament automàtic
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ${{ secrets.FTP_SERVER }}          # ftp.ivanjovanovich.me
+          username: ${{ secrets.FTP_USERNAME }}      # ivan@ivanjovanovich.me
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /ruta/en/tu/servidor/
+          local-dir: ./  # directorio base del repo
