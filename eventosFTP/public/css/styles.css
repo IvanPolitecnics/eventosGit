@@ -1,0 +1,116 @@
+/* Titulo principal evento */
+header h1.display-1 {
+    font-size: 10rem; /* Puedes cambiar este valor a tu gusto */
+    font-weight: 900; /* Hace que el texto esté en negrita */
+}
+
+/* Scroll suave para anclas */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Estilo opcional para el botón "Ver eventos" */
+header a.btn {
+    font-weight: bold;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+header a.btn:hover {
+    background-color: #f8f9fa;
+    color: #0d6efd;
+}
+
+
+#calendar {
+    max-width: 900px;
+    margin: 50px auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejorar la apariencia de los eventos */
+.fc-event {
+    background-color: #2c3e50 !important; /* Azul oscuro pastel */
+    border: none !important;
+    color: white !important;
+    font-weight: 500;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
+    white-space: nowrap; /* Evita que el texto se pase a varias líneas */
+    overflow: hidden; /* Esconde el texto que sobresalga */
+    text-overflow: ellipsis; /* Agrega puntos suspensivos (...) si el texto es demasiado largo */
+}
+
+/* Los eventos en la vista de mes tendrán márgenes para que no se toquen */
+.fc-daygrid-event {
+    margin: 2px; /* Espacio entre los eventos */
+}
+
+/* Opcional: mejorar estilo de cabecera */
+.fc-toolbar-title {
+    font-size: 1.5em;
+    color: #2c3e50;
+}
+
+/* Estilo de los botones de navegación */
+.fc-button {
+    background-color: #2c3e50 !important;
+    border: none !important;
+    color: white !important;
+}
+
+.fc-button:hover {
+    background-color: #34495e !important;
+}
+
+/* Los eventos que abarcan varios días deben seguir un formato que no invada otros días */
+.fc-daygrid-event.fc-event-start {
+    position: relative;
+}
+
+/* Asegurar separación entre los botones de navegación */
+.fc-toolbar .fc-button-group {
+    /* display: flex; */
+    gap: 10px; /* Añadir separación entre los botones */
+    align-items: center; /* Alinear los botones al centro verticalmente */
+}
+
+/* Separación entre los botones anteriores y siguientes */
+.fc-prev-button, .fc-next-button {
+    padding: 5px 15px; /* Añadir algo de relleno para un mejor tamaño */
+    border-radius: 5px; /* Bordes redondeados */
+    background-color: #2c3e50; /* Azul oscuro pastel */
+    color: white;
+    font-weight: bold;
+}
+
+.fc-prev-button:hover, .fc-next-button:hover {
+    background-color: #34495e; /* Color más claro al pasar el ratón */
+}
+
+/* Estilos para el botón "Hoy" */
+.fc-today-button {
+    padding: 5px 15px; /* Añadir relleno para que coincida con los otros botones */
+    border-radius: 5px;
+    background-color: #2c3e50;
+    color: white;
+    font-weight: bold;
+    margin-left: 10px; /* Un pequeño margen a la izquierda para separar de otros botones */
+    align-self: center; /* Centra el botón verticalmente en el contenedor */
+}
+
+.fc-today-button:hover {
+    background-color: #34495e; /* Color más claro al pasar el ratón */
+}
+
+/* Asegurar que todos los botones estén en una misma fila */
+.fc-toolbar {
+    display: flex;
+    justify-content: flex-start; /* Alinea todo a la izquierda */
+    align-items: center; /* Alinea todos los botones verticalmente */
+}
