@@ -19,7 +19,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www
 
 # Copia los archivos del proyecto Laravel
-COPY . .
+COPY eventosFTP/. .
 
 # Instala las dependencias de Laravel
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
