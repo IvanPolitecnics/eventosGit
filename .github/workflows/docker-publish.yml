@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main  # Se ejecuta solo cuando se hace push a la rama main
-    # También puedes usar pull_request: merged si prefieres trabajar sobre merges
 
 jobs:
   build-and-push:
