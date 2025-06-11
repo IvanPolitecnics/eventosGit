@@ -35,6 +35,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
 COPY . /var/www/html
 WORKDIR /var/www/html
 
+# [SOLUCIÓN] Marcar el directorio como seguro para git
+RUN git config --global --add safe.directory /var/www/html
+
 # Instalar dependencias PHP y JS
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader && \
     npm install && npm run build
