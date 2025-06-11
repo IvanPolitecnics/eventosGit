@@ -1,52 +1,34 @@
-FROM php:8.1-fpm-alpine as app
+FROM php:8.2-fpm
 
-# Useful PHP extension installer image, copy binary into your container
-COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+# Instala dependencias del sistema
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_mysql mbstring zip exif pcntl bcmath
 
-# Install php extensions
-# exit on errors, exit on unset variables, print every command as it is executed
-RUN set -eux; \
-    install-php-extensions pdo pdo_mysql;
+# Instala Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# RUN docker-php-ext-install pdo pdo_mysql
+# Crea el directorio de la app
+WORKDIR /var/www
 
-# allow super user - set this if you use Composer as a
-# super user at all times like in docker containers
-ENV COMPOSER_ALLOW_SUPERUSER=1
+# Copia los archivos del proyecto Laravel
+COPY . .
 
-# obtain composer using multi-stage build
-# https://docs.docker.com/build/building/multi-stage/
-COPY --from=composer:2.4 /usr/bin/composer /usr/bin/composer
+# Instala las dependencias de Laravel
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-#Here, we are copying only composer.json and composer.lock (instead of copying the entire source)
-# right before doing composer install.
-# This is enough to take advantage of docker cache and composer install will
-# be executed only when composer.json or composer.lock have indeed changed!-
-# https://medium.com/@softius/faster-docker-builds-with-composer-install-b4d2b15d0fff
-COPY ./app/composer.* ./
+# Permisos para Laravel
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage
 
-# install
-RUN composer install --prefer-dist --no-dev --no-scripts --no-progress --no-interaction
+# Expone el puerto (por si corres en modo serve)
+EXPOSE 9000
 
-# copy application files to the working directory
-COPY ./app .
-
-# run composer dump-autoload --optimize
-RUN composer dump-autoload --optimize
-
-# Dev image
-# This stage is meant to be target-built into a separate image
-# https://docs.docker.com/develop/develop-images/multistage-build/#stop-at-a-specific-build-stage
-# https://docs.docker.com/compose/compose-file/#target
-FROM app as app_dev
-
-# Xdebug has different modes / functionalities. We can default to 'off' and set to 'debug'
-# when we run docker compose up if we need it
-ENV XDEBUG_MODE=off
-
-# Copy xdebug config file into container
-COPY ./php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
-
-# Install xdebug
-RUN set -eux; \
-	install-php-extensions xdebug
+CMD ["php-fpm"]
