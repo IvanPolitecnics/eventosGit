@@ -1,64 +1,53 @@
-FROM ubuntu:20.04
+FROM php:8.2-fpm
 
+# Variables para no tener que interactuar en la instalación
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Instalar dependencias necesarias para añadir repositorios
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    software-properties-common \
+    nginx \
+    mariadb-server \
+    git \
+    unzip \
     curl \
-    lsb-release \
+    supervisor \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    nodejs \
+    npm \
     gnupg2 \
     ca-certificates
 
-# Añadir el repositorio de PHP 8.2
-RUN add-apt-repository ppa:ondrej/php -y && apt-get update
+# Instalar extensiones de PHP necesarias para Laravel
+RUN docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd xml
 
-# Instalar PHP 8.2 y extensiones necesarias
-RUN apt-get install -y \
-    php8.2 \
-    php8.2-fpm \
-    php8.2-cli \
-    php8.2-mysql \
-    php8.2-curl \
-    php8.2-mbstring \
-    php8.2-xml \
-    php8.2-bcmath \
-    php8.2-zip \
-    php8.2-common
-
-# Instalar NGINX, MySQL y otras herramientas
-RUN apt-get install -y \
-    nginx \
-    mysql-server \
-    git \
-    unzip \
-    supervisor
-
-# Instalar Composer
+# Instalar Composer globalmente
 RUN curl -sS https://getcomposer.org/installer | php && \
     mv composer.phar /usr/local/bin/composer
 
-# Instalar Node.js LTS (18.x)
+# Instalar Node.js LTS (18.x) desde repositorio oficial (más fiable que el que trae apt)
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
     apt-get install -y nodejs
 
-# Copiar el proyecto
+# Copiar el proyecto Laravel
 COPY . /var/www/html
 WORKDIR /var/www/html
 
-# Instalar dependencias del backend y frontend
+# Instalar dependencias PHP y JS
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader && \
     npm install && npm run build
 
-# Establecer permisos para Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Asignar permisos necesarios
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Copiar configuración personalizada
+# Copiar configuración personalizada de Nginx y supervisord
 COPY ./docker/nginx.conf /etc/nginx/sites-available/default
 COPY ./docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Exponer el puerto web
+# Exponer el puerto 80
 EXPOSE 80
 
-# Iniciar supervisord (que a su vez lanza nginx, php-fpm y mysql)
+# Iniciar supervisord que lanza PHP, Nginx y MySQL
 CMD ["/usr/bin/supervisord", "-n"]
